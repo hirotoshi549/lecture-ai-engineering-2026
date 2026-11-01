@@ -1,0 +1,114 @@
+{
+  "level": "発展",
+  "config": {
+    "base_model": "Qwen/Qwen3.5-0.8B",
+    "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+    "seed": 42,
+    "num_train_epochs": 8,
+    "warmup_steps": 6,
+    "lr": 0.0002,
+    "lora_r": 16,
+    "lora_alpha": 32,
+    "max_seq_len": 512,
+    "max_new_tokens": 160,
+    "gen": {
+      "do_sample": false
+    }
+  },
+  "versions": {
+    "transformers": "5.18.0",
+    "peft": "0.21.1",
+    "trl": "1.14.2",
+    "torch": "2.11.0+cu130"
+  },
+  "method": "LoRA（量子化なし）",
+  "data": {
+    "source": "scripts/make_sft_dataset.py (repo commit fae899a)",
+    "repo_commit": "fae899a409e2c99feee9d44a3789f936f5fc64ee",
+    "n_train": 116,
+    "n_terms": 58
+  },
+  "eval_counts": {
+    "A": 12,
+    "B": 12,
+    "C": 8,
+    "G": 3
+  },
+  "search_hit": {
+    "A_correct_term": 1.0,
+    "B_correct_term": 0.583,
+    "C_no_hit": 0.5
+  },
+  "train": {
+    "seconds": 273,
+    "steps": 120,
+    "epochs": 8.0,
+    "loss_first": 3.275604248046875,
+    "loss_final": 0.10022903680801391,
+    "loss_log": [
+      3.275604248046875,
+      2.2101821899414062,
+      1.6682233810424805,
+      0.9902810096740723,
+      0.5723324775695801,
+      0.3620672464370728,
+      0.19449117183685302,
+      0.1609802007675171,
+      0.1229264497756958,
+      0.10451765060424804,
+      0.09801766872406006,
+      0.10022903680801391
+    ],
+    "trainable_params": 6389760,
+    "trainable_pct": 0.842
+  },
+  "base": {
+    "label": "base",
+    "A_rate": 0.167,
+    "B_rate": 0.083,
+    "A_rate_general": 0.0,
+    "A_rate_course": 0.4,
+    "B_rate_general": 0.143,
+    "B_rate_course": 0.0,
+    "A_f1": 0.061,
+    "B_f1": 0.081,
+    "C_refusal_rate": 0.0,
+    "C_refusal_real": 0.0,
+    "C_refusal_fake": 0.0,
+    "G_rate": 1.0,
+    "seconds": 260.3
+  },
+  "search": {
+    "label": "search",
+    "A_rate": 0.417,
+    "B_rate": 0.333,
+    "A_rate_general": 0.571,
+    "A_rate_course": 0.2,
+    "B_rate_general": 0.429,
+    "B_rate_course": 0.2,
+    "A_f1": 0.514,
+    "B_f1": 0.354,
+    "C_refusal_rate": 0.5,
+    "C_refusal_real": 0.8,
+    "C_refusal_fake": 0.0,
+    "G_rate": 0.0,
+    "seconds": 40.8
+  },
+  "lora": {
+    "label": "lora",
+    "A_rate": 1.0,
+    "B_rate": 0.333,
+    "A_rate_general": 1.0,
+    "A_rate_course": 1.0,
+    "B_rate_general": 0.429,
+    "B_rate_course": 0.2,
+    "A_f1": 1.0,
+    "B_f1": 0.269,
+    "C_refusal_rate": 0.0,
+    "C_refusal_real": 0.0,
+    "C_refusal_fake": 0.0,
+    "G_rate": 0.333,
+    "seconds": 113.3
+  },
+  "executed_training_myself": true
+}
