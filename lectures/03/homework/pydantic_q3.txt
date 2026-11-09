@@ -1,0 +1,25 @@
+[model] gemini-3.5-flash-lite
+第3回では「AIエージェント」について学びます。
+
+具体的な要点は以下の通りです。
+
+1. **AIエージェントの基本構造**：LLMに「ツール」を持たせ、結果を見ながら自律的に行動を繰り返す「ループ」の仕組み（モデル＋ループ＋ツール）を理解します。
+2. **ツールの活用と設計**：LLMがどのようにツールの説明文や引数を解釈して呼び出すか、またツールの説明文の書き方が挙動にどう影響するかを学びます。
+3. **Pydantic AIの利用**：型定義を使ってツールや構造化出力を安全に扱い、APIを呼ばずにテストできる機能（TestModel）などを学びます。
+4. **エージェントループの注意点**：複数回LLMを呼び出すことによるコスト（料金や応答時間、レート制限）や、ガードレール・Human-in-the-loop（人の確認）の重要性を学びます。
+
+第3回
+
+--- trace ---
+[tool call]   get_lecture_summary({'lecture': 3})
+[tool return] get_lecture_summary -> # 第3回 AIエージェント
+
+## この回のねらい
+
+- AIエージェントの基本構造が「モデル＋ループ＋ツール」であることを理解する
+- Pydantic AIで、ツールを使う学習支援エージェントを自分で作り、動かす
+
+## 要点
+
+1.…
+[usage] RunUsage(cost=Decimal('0.0009121'), details={'text_prompt_tokens': 1107}, input_text_tokens=1107, input_tokens=1107, output_tokens=232, requests=2, tool_calls=1)

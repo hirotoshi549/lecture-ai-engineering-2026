@@ -1,0 +1,12 @@
+[model] gemini-3.5-flash-lite
+第2回の内容から確認問題を1問出します。
+
+**問題：**
+「PEFT」とはどういう意味ですか？
+
+（答えを考えたら教えてくださいね！第2回）
+
+--- trace ---
+[tool call]   make_quiz({'lecture': 2})
+[tool return] make_quiz -> {"lecture": 2, "term": "PEFT", "question": "「PEFT」とはどういう意味ですか？", "answer": "モデルの全パラメータではなく、ごく一部や追加した小さなパラメータだけを学習する手法の総称…
+[usage] RunUsage(cost=Decimal('0.0004475'), details={'text_prompt_tokens': 1025}, input_text_tokens=1025, input_tokens=1025, output_tokens=56, requests=2, tool_calls=1)
