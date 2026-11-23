@@ -16,7 +16,7 @@ import sqlite_vec
 
 from app.config import (
     EMBEDDING_DIMENSIONS, EMBEDDING_MAX_TOKENS, EMBEDDING_MODEL,
-    RAG_DB, RAG_DOCUMENT_IDS, RAG_SOURCE, RAG_TOP_K, RAG_TREE, get_api_key,
+    RAG_DB, RAG_DOCUMENT_IDS, RAG_NEIGHBOR_PAGES, RAG_SOURCE, RAG_TOP_K, RAG_TREE, get_api_key,
     RAG_GRAPH, GRAPH_START_K, GRAPH_HOPS, GRAPH_MAX_RESULTS,
 )
 
@@ -138,6 +138,38 @@ def search(query: str) -> list[dict]:
         return [dict(row) for row in rows]
 
 
+def add_neighbors(hits: list[dict], window: int = 1) -> list[dict]:
+    """第5回 宿題（実装）: 各検索結果に、同じ資料の前後 window ページの本文を付ける。
+
+    - 別の資料（講義）のページはまたがない
+    - 検索結果そのものに入っているページや、すでに別の結果に付けたページは付けない（重複させない）
+    付けたページは各結果の "neighbors" に、検索結果との位置関係（"前のページ"／"次のページ"）付きで入る。
+    """
+    if window <= 0:
+        return hits
+    pages = load_pages(RAG_SOURCE)
+    position = {page["page_id"]: i for i, page in enumerate(pages)}
+    used = {hit["page_id"] for hit in hits}
+    results = []
+    for hit in hits:
+        neighbors = []
+        i = position.get(hit["page_id"])
+        if i is not None:
+            for offset in [-d for d in range(window, 0, -1)] + list(range(1, window + 1)):
+                j = i + offset
+                if not 0 <= j < len(pages):
+                    continue
+                page = pages[j]
+                if page["document_id"] != hit["document_id"] or page["page_id"] in used:
+                    continue
+                used.add(page["page_id"])
+                neighbors.append({"relation": "前のページ" if offset < 0 else "次のページ",
+                                  "page_id": page["page_id"], "page": page["page"],
+                                  "title": page["title"], "content": page["content"]})
+        results.append({**hit, "neighbors": neighbors})
+    return results
+
+
 def search_graph(query: str) -> dict:
     """ベクトル検索を入口に、前後ページと共通用語で候補を広げる。"""
     pages = {page["page_id"]: page for page in load_pages(RAG_SOURCE)}
@@ -201,11 +233,16 @@ def run_full_context(agent, question: str, model, instructions: str, prompt_temp
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="エージェントを使わず、講義資料の検索だけを実行する")
     parser.add_argument("query", help="調べたい内容")
+    parser.add_argument("--neighbors", type=int, default=RAG_NEIGHBOR_PAGES,
+                        help="検索結果に付ける前後のページ数（第5回 宿題・実装）。既定は AIE_RAG_NEIGHBORS")
     args = parser.parse_args()
-    for i, result in enumerate(search(args.query), 1):
+    for i, result in enumerate(add_neighbors(search(args.query), args.neighbors), 1):
         print(f"\n{'=' * 60}\n検索結果 {i}\n{'=' * 60}")
         print(f"講義: {result['document_title']}")
         print(f"章: {result['section']}")
         print(f"タイトル: {result['title']}")
         print(f"ページ: {result['page']}")
         print(f"\n{result['content']}")
+        for neighbor in result.get("neighbors", []):
+            print(f"\n--- 付けたページ（{neighbor['relation']}）: ページ {neighbor['page']} {neighbor['title']}")
+            print(neighbor["content"])
