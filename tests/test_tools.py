@@ -59,3 +59,27 @@ def test_make_quiz_picks_a_term_of_the_lecture():
 
 def test_make_quiz_reports_lecture_without_terms():
     assert "用語集にありません" in tools.make_quiz(99)
+
+
+# 第6回 宿題（実装）: 範囲外の回では、何が問題か・選べる回・利用者に伝えることを返す
+def test_make_quiz_out_of_range_explains_how_to_fix():
+    message = tools.make_quiz(99)
+    assert "第6回）より後" in message
+    assert "第1回、第2回、第3回、第4回、第6回" in message
+    assert "利用者には" in message
+
+
+def test_make_quiz_lecture_without_terms_yet():
+    assert "まだ用語集に登録されていません" in tools.make_quiz(5)
+
+
+def test_make_quiz_rejects_non_positive_lecture():
+    assert tools.make_quiz(0).startswith("引数の誤り：lecture は 1 以上の整数")
+
+
+def test_mcp_server_exposes_make_quiz():
+    import asyncio
+    from app.mcp_server import server
+
+    names = {tool.name for tool in asyncio.run(server.list_tools())}
+    assert {"search_glossary", "make_quiz"} <= names
