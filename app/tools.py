@@ -89,11 +89,23 @@ def make_quiz(lecture: int) -> str:
     利用者が理解を確かめる問題を求めたときに使う。用語の意味の説明を求められたときは
     search_glossary を使い、このツールは使わない。
     返り値の answer は、利用者が解答してから見せる（問題と同時に答えを出さない）。
+    指定された回が講座にあるか分からないとき（例: 第99回）も、自分で判断せずにこのツールを呼ぶ。
+    問題を作れる回は、このツールが返す。
     """
+    available = sorted({e["lecture"] for e in load_glossary()})
+    choices = "、".join(f"第{n}回" for n in available)
+    # 第6回 宿題（実装）: 範囲外のときは、何が問題か・どう直すか・利用者に何を伝えるかを返す
+    if lecture < 1:
+        return (f"引数の誤り：lecture は 1 以上の整数で指定してください（入力値は {lecture}）。"
+                f"確認問題を作れる回は {choices} です。")
     candidates = [e for e in load_glossary() if e["lecture"] == lecture]
     if not candidates:
-        available = sorted({e["lecture"] for e in load_glossary()})
-        return f"第{lecture}回の用語は用語集にありません。用語がある回: {', '.join(map(str, available))}"
+        reason = (f"第{lecture}回は、用語集にある最後の回（第{available[-1]}回）より後です。"
+                  if lecture > available[-1] else f"第{lecture}回の用語は、まだ用語集に登録されていません。")
+        return (f"第{lecture}回の用語は用語集にありません。{reason}"
+                f"確認問題を作れる回は {choices} です。lecture にはこのどれかを指定して呼び直してください。"
+                f"利用者には、第{lecture}回の問題は作れないことと、選べる回を伝え、どの回にするか尋ねてください。"
+                "用語集にない内容で問題を作らないでください。")
     entry = random.choice(candidates)
     return json.dumps(
         {
